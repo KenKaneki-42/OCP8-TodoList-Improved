@@ -12,13 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+
 #[Route('/users')]
 class UserController extends AbstractController
 {
     #[Route('/', name: 'user_list', methods: ['GET'])]
     public function listAction(UserRepository $userRepository): Response
     {
-        return $this->render('user/index.html.twig', [
+        return $this->render('user/list.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
     }
@@ -57,7 +58,7 @@ class UserController extends AbstractController
             $user->setPassword($userPasswordHasher->hashPassword($user, $user->getPassword()));
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('user_list', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('user/edit.html.twig', [
