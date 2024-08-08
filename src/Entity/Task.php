@@ -16,18 +16,30 @@ class Task
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::STRING)]
     #[Assert\NotBlank(message: 'Vous devez saisir un titre.')]
+    #[Assert\Length(
+      min: 2,
+      max: 255,
+      minMessage: 'Le titre doit contenir au moins {{ limit }} caractères.',
+      maxMessage: 'Le titre ne peut excéder {{ limit }} caractères.'
+  )]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Vous devez saisir du contenu.')]
     private ?string $content = null;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
+    #[ORM\Column(type: Types::BOOLEAN, nullable: false)]
     private ?bool $isDone = null;
+
+    // spécifier que l'entité associée doit être chargée immédiatement avec l'entité principale
+    #[ORM\ManyToOne(inversedBy: 'tasks',  fetch: 'EAGER')]
+    #[ORM\JoinColumn(nullable: true, name: 'user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -88,8 +100,20 @@ class Task
         return $this;
     }
 
-    public function toggle($flag)
+    public function toggle(bool $flag): void
     {
         $this->isDone = $flag;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }
