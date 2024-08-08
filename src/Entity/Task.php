@@ -37,7 +37,7 @@ class Task
     private ?bool $isDone = null;
 
     // spécifier que l'entité associée doit être chargée immédiatement avec l'entité principale
-    #[ORM\ManyToOne(inversedBy: 'tasks',  fetch: 'EAGER')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tasks',  fetch: 'EAGER')]
     #[ORM\JoinColumn(nullable: true, name: 'user_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     private ?User $user = null;
 
