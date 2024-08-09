@@ -7,20 +7,19 @@
     <server name="APP_ENV" value="test" force="true"/>
     <server name="SHELL_VERBOSITY" value="-1"/>
     <server name="SYMFONY_PHPUNIT_REMOVE" value=""/>
-    <server name="SYMFONY_PHPUNIT_VERSION" value="10.5.29"/>
-    <server name="DATABASE_URL" value="mysql://root:Abcdef+200594@localhost:3306/OCP8_test?serverVersion=8.3&amp;charset=utf8mb4"/>
+    <server name="SYMFONY_PHPUNIT_VERSION" value="9.6"/>
   </php>
-  <testsuites>
-    <testsuite name="Project Test Suite">
-      <directory>tests</directory>
-    </testsuite>
-  </testsuites>
-  <source>
+  <coverage>
     <include>
       <directory suffix=".php">src</directory>
     </include>
     <exclude>
       <directory suffix=".php">tests</directory>
     </exclude>
-  </source>
+  </coverage>
+  <testsuites>
+    <testsuite name="Project Test Suite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>

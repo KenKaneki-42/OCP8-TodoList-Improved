@@ -30,8 +30,9 @@
         "dama/doctrine-test-bundle": "^8.2",
         "friendsofphp/php-cs-fixer": "^3.61",
         "phpstan/phpstan": "^1.11",
-        "phpunit/phpunit": "^11.3",
-        "symfony/maker-bundle": "^1.60"
+        "phpunit/phpunit": "^10.0",
+        "symfony/maker-bundle": "^1.60",
+        "symfony/phpunit-bridge": "^7.1"
     },
     "config": {
         "allow-plugins": {
