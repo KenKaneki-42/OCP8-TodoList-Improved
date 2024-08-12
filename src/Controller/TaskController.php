@@ -5,8 +5,8 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class TaskController extends AbstractController
 {
     #[Route('/', name: 'task_list', methods: ['GET'])]
-    public function listAction(TaskRepository $taskRepository): Response
+    public function list(TaskRepository $taskRepository): Response
     {
         return $this->render('task/list.html.twig', [
             'tasks' => $taskRepository->findAll(),
@@ -25,15 +25,20 @@ class TaskController extends AbstractController
     }
 
     #[Route('/create', name: 'task_create', methods: ['GET', 'POST'])]
-    public function createAction(Request $request, EntityManagerInterface $entityManager): Response
+    public function create(Request $request, TaskRepository $taskRepository, Security $security): Response
     {
+        // check if the user is logged in
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $task = new Task();
+        $user = $security->getUser();
+        $task->setUser($user);
+
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($task);
-            $entityManager->flush();
+            $taskRepository->save($task, true);
             $this->addFlash('success', "La tâche a bien été ajoutée.");
 
             return $this->redirectToRoute('task_list', [], Response::HTTP_SEE_OTHER);
@@ -46,13 +51,23 @@ class TaskController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'task_edit', methods: ['GET', 'POST'])]
-    public function editAction(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Task $task, TaskRepository $taskRepository): Response
     {
+        // 2 ways to check if the user has permission to edit the task.
+
+        // Check if the user has permission to edit the task (using the isGranted method)
+        // if (!$this->security->isGranted('EDIT', $task)) {
+        //     throw new AccessDeniedException('You do not have permission to edit this task.');
+        // }
+
+        // Check if the user has permission to edit the task (using the denyAccessUnlessGranted method from the AbstractController and the Voter)
+        $this->denyAccessUnlessGranted('edit', $task);
+
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $taskRepository->save($task, true);
 
             return $this->redirectToRoute('task_list', [], Response::HTTP_SEE_OTHER);
         }
@@ -64,10 +79,13 @@ class TaskController extends AbstractController
     }
 
     #[Route('/{id}/toggle', name: 'task_toggle', methods: ['POST'])]
-    public function toggleTaskAction(Task $task, EntityManagerInterface $entityManager): Response
+    public function toggle(Task $task, TaskRepository $taskRepository): Response
     {
+        // Check if the user has permission to toggle the task (Voter)
+        $this->denyAccessUnlessGranted('toggle', $task);
+
         $task->toggle(!$task->isDone());
-        $entityManager->flush();
+        $taskRepository->save($task, true);
 
         $message = $task->isDone()
         ? sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle())
@@ -79,11 +97,13 @@ class TaskController extends AbstractController
     }
 
     #[Route('/{id}', name: 'task_delete', methods: ['POST'])]
-    public function deleteTaskAction(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Task $task, TaskRepository $taskRepository): Response
     {
+        // Check if the user has permission to delete the task (Voter)
+        $this->denyAccessUnlessGranted('delete', $task);
+
         if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($task);
-            $entityManager->flush();
+            $taskRepository->remove($task, true);
 
             $this->addFlash('success', 'La tâche a bien été supprimée.');
         }
