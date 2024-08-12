@@ -6,6 +6,7 @@ use App\Entity\Task;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TaskType extends AbstractType
 {
@@ -14,10 +15,24 @@ class TaskType extends AbstractType
         $builder
             ->add('createdAt', null, [
                 'widget' => 'single_text',
+                'label' => 'Date de création',
+                'attr' => ['class' => 'form-control'],
             ])
-            ->add('title')
-            ->add('content')
-            ->add('isDone')
+            ->add('title', null, [
+                'label' => 'Titre',
+                'constraints' => [
+                    new NotBlank(['message' => 'Le titre ne peut pas être vide.']),
+                ],
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('content', null, [
+                'label' => 'Contenu',
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('isDone', null, [
+                'label' => 'Terminé',
+                'attr' => ['class' => 'form-check-input'],
+            ])
         ;
     }
 
