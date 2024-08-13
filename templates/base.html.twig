@@ -33,8 +33,57 @@
         {% endblock %}
 
         <div class="container">
-            {% block body %}{% endblock %}
+
+            <div class="row">
+                <a href="{{ path('user_create') }}" class="btn btn-primary">Créer un utilisateur</a>
+
+                {% if app.user %}
+                <a href="{{ path('app_logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
+                {% endif %}
+
+                {% if not app.user and 'login' != app.request.attributes.get('_route') %}
+                <a href="{{ path('app_login') }}" class="btn btn-success">Se connecter</a>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} alert-dissmissible no-margin" role="alert">
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" arial-label="close"></button>
+                                <div class="alert-message">
+                                    {{ message }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    {% block header_title %}{% endblock %}
+                    {% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">{% endblock %}
+                </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="container">
+
+            <hr>
+            <footer>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <p class="pull-right">Copyright &copy; OpenClassrooms</p>
+                    </div>
+                </div>
+            </footer>
+
         </div>
 
+        <script src="{{ asset('js/jquery.js') }}"></script>
+        <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     </body>
 </html>
