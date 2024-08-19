@@ -37,78 +37,43 @@ class TaskVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        $user = $token->getUser();
-
-        if (!$user instanceof User) {
-            // the user must be logged in; if not, deny access
-            return false;
-        }
-
-        if ($this->security->isGranted('ROLE_SUPER_ADMIN') && 'super.admin@email.fr' === $user->getEmail()) {
-            return true;
-        }
- p
-        // you know $subject is a Task object, thanks to `supports()`
         /** @var Task $task */
         $task = $subject;
 
-        if ($this->security->isGranted('ROLE_ADMIN') && null === $task->getUser()) {
-            return true;
+        // Add your logic here to determine if the user can perform the action
+        // For example:
+        // $user = $token->getUser();
+        // if (!$user instanceof User) {
+        //     return false;
+        // }
+
+        switch ($attribute) {
+            case self::DELETE:
+                return $this->canDelete($task, $token);
+            case self::TOGGLE:
+                return $this->canToggle($task, $token);
+            case self::EDIT:
+                return $this->canEdit($task, $token);
         }
 
-        return match ($attribute) {
-            self::TOGGLE => $this->canToggle($task, $user),
-            self::DELETE => $this->canDelete($task, $user),
-            self::EDIT => $this->canEdit($task, $user),
-            default => throw new \LogicException('Ce voteur ne devrait pas être atteint.')
-        };
+        return false;
     }
 
-    private function canToggle(Task $task, User $user): bool
+    private function canDelete(Task $task, TokenInterface $token): bool
     {
-        // Permettre aux administrateurs de basculer même si la tâche n'a pas d'utilisateur associé
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            return true;
-        }
-
-        // Vérifie si la tâche a un utilisateur associé
-        if (null === $task->getUser()) {
-            return false;
-        }
-
-        // Vérifie si l'utilisateur est associé à la tâche
-        return $user === $task->getUser();
+        // Add your logic to determine if the user can delete the task
+        return true;
     }
 
-    private function canDelete(Task $task, User $user): bool
+    private function canToggle(Task $task, TokenInterface $token): bool
     {
-        // Permettre aux administrateurs de supprimer même si la tâche n'a pas d'utilisateur associé
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            return true;
-        }
-
-        // Vérifie si la tâche a un utilisateur associé
-        if (null === $task->getUser()) {
-            return false;
-        }
-
-        // Vérifie si l'utilisateur est associé à la tâche
-        return $user === $task->getUser();
+        // Add your logic to determine if the user can toggle the task
+        return true;
     }
 
-    private function canEdit(Task $task, User $user): bool
+    private function canEdit(Task $task, TokenInterface $token): bool
     {
-        // Permettre aux administrateurs d'éditer même si la tâche n'a pas d'utilisateur associé
-        if ($this->security->isGranted('ROLE_ADMIN')) {
-            return true;
-        }
-
-        // Vérifie si la tâche a un utilisateur associé
-        if (null === $task->getUser()) {
-            return false;
-        }
-
-        // Vérifie si l'utilisateur est associé à la tâche
-        return $user === $task->getUser();
+        // Add your logic to determine if the user can edit the task
+        return true;
     }
 }
