@@ -3,7 +3,7 @@
 {% block title %}Liste des Utilisateurs{% endblock %}
 
 {% block body %}
-    
+    <h1>Liste des utilisateurs</h1>
     {% if users|length == 0 %}
         <div class="alert alert-warning" role="alert">
             Il n'y a pas encore d'utilisateur enregistré. <a href="{{ path('user_create') }}" class="btn btn-warning pull-right">Créer un utilisateur</a>
