@@ -8,7 +8,7 @@
     <server name="SHELL_VERBOSITY" value="-1"/>
     <server name="SYMFONY_PHPUNIT_REMOVE" value=""/>
     <server name="SYMFONY_PHPUNIT_VERSION" value="10.5.29"/>
-    <server name="DATABASE_URL" value="mysql://root:Abcdef+200594@localhost:3306/OCP8_test?serverVersion=8.3&amp;charset=utf8mb4"/>
+    <server name="DATABASE_URL" value="mysql://root:Abcdef+200594@localhost:3306/OCP8?serverVersion=8.3&amp;charset=utf8mb4"/>
   </php>
   <testsuites>
     <testsuite name="Project Test Suite">
