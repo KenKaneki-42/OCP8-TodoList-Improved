@@ -12,7 +12,6 @@ class TaskVoter extends Voter
 {
     public const TOGGLE = 'toggle';
     public const DELETE = 'delete';
-    public const EDIT = 'edit';
     private Security $security;
 
     public function __construct(Security $security)
@@ -23,7 +22,7 @@ class TaskVoter extends Voter
     protected function supports(string $attribute, mixed $subject): bool
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, [self::DELETE, self::TOGGLE, self::EDIT])) {
+        if (!in_array($attribute, [self::DELETE, self::TOGGLE])) {
             return false;
         }
 
@@ -37,43 +36,39 @@ class TaskVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
+        $user = $token->getUser();
+
+        if (!$user instanceof User) {
+            // the user must be logged in; if not, deny access
+            return false;
+        }
+
+        if ($this->security->isGranted('ROLE_SUPER_ADMIN') && 'super.admin@orange.fr' === $user->getEmail()) {
+            return true;
+        }
+
+        // you know $subject is a Task object, thanks to `supports()`
         /** @var Task $task */
         $task = $subject;
 
-        // Add your logic here to determine if the user can perform the action
-        // For example:
-        // $user = $token->getUser();
-        // if (!$user instanceof User) {
-        //     return false;
-        // }
-
-        switch ($attribute) {
-            case self::DELETE:
-                return $this->canDelete($task, $token);
-            case self::TOGGLE:
-                return $this->canToggle($task, $token);
-            case self::EDIT:
-                return $this->canEdit($task, $token);
+        if ($this->security->isGranted('ROLE_ADMIN') && null === $task->getUser()) {
+            return true;
         }
 
-        return false;
+        return match ($attribute) {
+            self::TOGGLE => $this->canToggle($task, $user),
+            self::DELETE => $this->canDelete($task, $user),
+            default => throw new \LogicException('Ce voteur ne devrait pas être atteint.')
+        };
     }
 
-    private function canDelete(Task $task, TokenInterface $token): bool
+    private function canToggle(Task $task, User $user): bool
     {
-        // Add your logic to determine if the user can delete the task
-        return true;
+        return $user === $task->getUser();
     }
 
-    private function canToggle(Task $task, TokenInterface $token): bool
+    private function canDelete(Task $task, User $user): bool
     {
-        // Add your logic to determine if the user can toggle the task
-        return true;
-    }
-
-    private function canEdit(Task $task, TokenInterface $token): bool
-    {
-        // Add your logic to determine if the user can edit the task
-        return true;
+        return $user === $task->getUser();
     }
 }
