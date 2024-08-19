@@ -11,14 +11,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/tasks')]
 #[IsGranted('ROLE_USER')]
 class TaskController extends AbstractController
 {
     #[Route('/', name: 'task_list', methods: ['GET'])]
-    public function list(TaskRepository $taskRepository): Response
-    {
+    public function list(TaskRepository $taskRepository, Security $security): Response
+    {  
+      $user = $security->getUser();
+      if (!$user instanceof UserInterface) {
+          throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page.');
+      }
         return $this->render('task/list.html.twig', [
             'tasks' => $taskRepository->findAll(),
         ]);

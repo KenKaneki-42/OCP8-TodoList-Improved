@@ -47,7 +47,7 @@ class TaskVoter extends Voter
         if ($this->security->isGranted('ROLE_SUPER_ADMIN') && 'super.admin@email.fr' === $user->getEmail()) {
             return true;
         }
-
+ p
         // you know $subject is a Task object, thanks to `supports()`
         /** @var Task $task */
         $task = $subject;

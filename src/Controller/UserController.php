@@ -19,9 +19,11 @@ use Symfony\Contracts\Cache\ItemInterface;
 #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_SUPER_ADMIN")'))]
 class UserController extends AbstractController
 {
-    #[Route('/', name: 'user_list', methods: ['GET'])]
+    #[Route('/', name: 'list', methods: ['GET'])]
     public function list(UserRepository $userRepository, TagAwareCacheInterface $cachePool): Response
     {
+        // $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $idCache = 'getUsersList';
         $usersList = $cachePool->get($idCache, function (ItemInterface $item) use ($userRepository) {
             $item->tag('usersCache');
@@ -37,6 +39,8 @@ class UserController extends AbstractController
     #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     public function create(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasher, TagAwareCacheInterface $cachePool): Response
     {
+        // $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
@@ -60,6 +64,8 @@ class UserController extends AbstractController
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, UserRepository $userRepository, UserPasswordHasherInterface $userPasswordHasher, TagAwareCacheInterface $cachePool): Response
     {
+        // $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
