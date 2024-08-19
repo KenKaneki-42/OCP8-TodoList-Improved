@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Tests\Repository;
+
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
