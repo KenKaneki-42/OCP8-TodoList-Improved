@@ -12,25 +12,34 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[Route('/tasks')]
 #[IsGranted('ROLE_USER')]
 class TaskController extends AbstractController
 {
     #[Route('/', name: 'task_list', methods: ['GET'])]
-    public function list(TaskRepository $taskRepository, Security $security): Response
-    {  
-      $user = $security->getUser();
-      if (!$user instanceof UserInterface) {
-          throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page.');
-      }
+    public function list(TaskRepository $taskRepository, Security $security, TagAwareCacheInterface $cachePool): Response
+    {
+        $user = $security->getUser();
+        if (!$user instanceof UserInterface) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page.');
+        }
+
+        $idCache = 'getTasksList';
+        $tasksList = $cachePool->get($idCache, function (ItemInterface $item) use ($taskRepository) {
+            $item->tag('tasksCache');
+            return $taskRepository->findAll();
+        });
+
         return $this->render('task/list.html.twig', [
-            'tasks' => $taskRepository->findAll(),
+            'tasks' => $tasksList,
         ]);
     }
 
     #[Route('/create', name: 'task_create', methods: ['GET', 'POST'])]
-    public function create(Request $request, TaskRepository $taskRepository, Security $security): Response
+    public function create(Request $request, TaskRepository $taskRepository, Security $security, TagAwareCacheInterface $cachePool): Response
     {
         // check if the user is logged in
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -46,6 +55,9 @@ class TaskController extends AbstractController
             $taskRepository->save($task, true);
             $this->addFlash('success', "La tâche a bien été ajoutée.");
 
+            // Invalidate cache
+            $cachePool->invalidateTags(['tasksCache']);
+
             return $this->redirectToRoute('task_list', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -56,16 +68,8 @@ class TaskController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'task_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Task $task, TaskRepository $taskRepository): Response
+    public function edit(Request $request, Task $task, TaskRepository $taskRepository, TagAwareCacheInterface $cachePool): Response
     {
-        // 2 ways to check if the user has permission to edit the task.
-
-        // Check if the user has permission to edit the task (using the isGranted method)
-        // if (!$this->security->isGranted('EDIT', $task)) {
-        //     throw new AccessDeniedException('You do not have permission to edit this task.');
-        // }
-
-        // Check if the user has permission to edit the task (using the denyAccessUnlessGranted method from the AbstractController and the Voter)
         $this->denyAccessUnlessGranted('edit', $task);
 
         $form = $this->createForm(TaskType::class, $task);
@@ -73,6 +77,9 @@ class TaskController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $taskRepository->save($task, true);
+
+            // Invalidate cache
+            $cachePool->invalidateTags(['tasksCache']);
 
             return $this->redirectToRoute('task_list', [], Response::HTTP_SEE_OTHER);
         }
@@ -84,13 +91,16 @@ class TaskController extends AbstractController
     }
 
     #[Route('/{id}/toggle', name: 'task_toggle', methods: ['POST'])]
-    public function toggle(Task $task, TaskRepository $taskRepository): Response
+    public function toggle(Task $task, TaskRepository $taskRepository, TagAwareCacheInterface $cachePool): Response
     {
         // Check if the user has permission to toggle the task (Voter)
         $this->denyAccessUnlessGranted('toggle', $task);
 
         $task->toggle(!$task->isDone());
         $taskRepository->save($task, true);
+
+        // Invalidate cache
+        $cachePool->invalidateTags(['tasksCache', 'tasksDoneCache']);
 
         $message = $task->isDone()
         ? sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle())
@@ -102,17 +112,34 @@ class TaskController extends AbstractController
     }
 
     #[Route('/{id}', name: 'task_delete', methods: ['POST'])]
-    public function delete(Request $request, Task $task, TaskRepository $taskRepository): Response
+    public function delete(Request $request, Task $task, TaskRepository $taskRepository, TagAwareCacheInterface $cachePool): Response
     {
         // Check if the user has permission to delete the task (Voter)
         $this->denyAccessUnlessGranted('delete', $task);
 
         if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->getPayload()->getString('_token'))) {
             $taskRepository->remove($task, true);
-
+            // Invalidate cache
+            $cachePool->invalidateTags(['tasksCache', 'tasksDoneCache']);
             $this->addFlash('success', 'La tâche a bien été supprimée.');
         }
 
         return $this->redirectToRoute('task_list', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/done', name: 'list_done', methods: ['GET'])]
+    public function listDone(TaskRepository $taskRepository, TagAwareCacheInterface $cachePool): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $idCache = 'getDoneTasksList';
+        $tasksList = $cachePool->get($idCache, function (ItemInterface $item) use ($taskRepository) {
+            $item->tag('tasksDoneCache');
+            $cachedTasksList = $taskRepository->findUserTasksDone();
+
+            return $cachedTasksList;
+        });
+
+        return $this->render('task/list-done.html.twig', ['tasks' => $tasksList]);
     }
 }
