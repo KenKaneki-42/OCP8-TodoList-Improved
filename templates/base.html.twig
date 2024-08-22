@@ -8,9 +8,7 @@
         <meta name="author" content="">
 
         <title>{% block title %}To Do List app{% endblock %}</title>
-        <!-- Bootstrap Core CSS -->
-        <link href="{{ asset('bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('bootstrap-icons/font/bootstrap-icons.min.css') }}" rel="stylesheet">
+
         {% block stylesheets %}
         {% endblock %}
     </head>
@@ -59,7 +57,6 @@
 
         {% block javascripts %}
             {% block importmap %}
-                {# {{ importmap('bootstrap/dist/js/bootstrap.bundle.min.js') }} #}
                 {{ importmap('app') }}
             {% endblock %}
         {% endblock %}
