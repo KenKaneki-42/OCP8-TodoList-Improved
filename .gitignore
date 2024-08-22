@@ -64,5 +64,8 @@ phpstan.neon
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 
-# Ignore test coverage reports
-/test-coverage/
+# Ignore the cache directory
+.phpunit.cache/
+
+# Ignore the coverage directory
+public/test-coverage/
