@@ -12,6 +12,8 @@ class TaskVoter extends Voter
 {
     public const TOGGLE = 'toggle';
     public const DELETE = 'delete';
+    public const CREATE = 'create';
+    public const EDIT = 'edit';
     private Security $security;
 
     public function __construct(Security $security)
@@ -22,7 +24,7 @@ class TaskVoter extends Voter
     protected function supports(string $attribute, mixed $subject): bool
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, [self::DELETE, self::TOGGLE])) {
+        if (!in_array($attribute, [self::DELETE, self::TOGGLE, self::EDIT, self::CREATE])) {
             return false;
         }
 
@@ -58,6 +60,8 @@ class TaskVoter extends Voter
         return match ($attribute) {
             self::TOGGLE => $this->canToggle($task, $user),
             self::DELETE => $this->canDelete($task, $user),
+            self::EDIT => $this->canEdit($task, $user),
+            self::CREATE => $this->canDelete($task, $user),
             default => throw new \LogicException('Ce voteur ne devrait pas être atteint.')
         };
     }
@@ -70,5 +74,10 @@ class TaskVoter extends Voter
     private function canDelete(Task $task, User $user): bool
     {
         return $user === $task->getUser();
+    }
+
+    private function canEdit(Task $task, User $user): bool
+    {
+        return $user === $task->getUser() || $this->security->isGranted('ROLE_ADMIN');
     }
 }
