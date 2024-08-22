@@ -63,3 +63,6 @@ phpstan.neon
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+# Ignore test coverage reports
+/test-coverage/
