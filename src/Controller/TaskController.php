@@ -30,7 +30,7 @@ class TaskController extends AbstractController
         $idCache = 'getTasksList';
         $tasksList = $cachePool->get($idCache, function (ItemInterface $item) use ($taskRepository) {
             $item->tag('tasksCache');
-            return $taskRepository->findAll();
+            return $taskRepository->findUserTasks($this->getUser());
         });
 
         return $this->render('task/list.html.twig', [
