@@ -35,12 +35,6 @@ security:
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
-    access_control:
-        - { path: ^/users, roles: ROLE_ADMIN }
-        # j'ai du ajouter cette ligne pour que le testTaskController fonctionne pour le test de l'user non authentifié, pourtant j'ai déjà un isGranted dans le controller.....
-        - { path: ^/tasks, roles: ROLE_USER }
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:
