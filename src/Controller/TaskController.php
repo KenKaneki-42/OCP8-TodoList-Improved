@@ -64,6 +64,7 @@ class TaskController extends AbstractController
         return $this->render('task/create.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
+            'button_label' => 'Ajouter',
         ]);
     }
 
@@ -77,7 +78,7 @@ class TaskController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $taskRepository->save($task, true);
-
+            $this->addFlash('success', "La tâche a bien été modifiée.");
             // Invalidate cache
             $cachePool->invalidateTags(['tasksCache']);
 
@@ -87,10 +88,11 @@ class TaskController extends AbstractController
         return $this->render('task/edit.html.twig', [
             'task' => $task,
             'form' => $form->createView(),
+            'button_label' => 'Modifier',
         ]);
     }
 
-    #[Route('/{id}/toggle', name: 'task_toggle', methods: ['POST'])]
+    #[Route('/{id}/toggle', name: 'task_toggle', methods: ['GET','POST'])]
     public function toggle(Task $task, TaskRepository $taskRepository, TagAwareCacheInterface $cachePool): Response
     {
         // Check if the user has permission to toggle the task (Voter)
@@ -103,8 +105,8 @@ class TaskController extends AbstractController
         $cachePool->invalidateTags(['tasksCache', 'tasksDoneCache']);
 
         $message = $task->isDone()
-        ? sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle())
-        : sprintf('La tâche %s a bien été marquée comme non faite.', $task->getTitle());
+        ? sprintf('La tâche \'%s\' a bien été marquée comme faite.', $task->getTitle())
+        : sprintf('La tâche \'%s\' a bien été marquée comme non faite.', $task->getTitle());
 
         $this->addFlash('success', $message);
 
