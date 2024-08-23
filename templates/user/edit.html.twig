@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un utilisateur{% endblock %}
+
+{% block body %}
+    <h1>Modifier {{user.username}}</h1>
+    <div class="row user-form">
+        {{ form_start(form, {'action' : path('user_edit', {'id' : user.id})}) }}
+        {{ form_widget(form) }}
+
+        <button type="submit" class="btn btn-success pull-right add-user-button">Modifier</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

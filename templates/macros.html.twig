@@ -1,0 +1,10 @@
+
+{% macro display_errors(field) %}
+    {% if field.vars.errors|length > 0 %}
+        <ul class="form-error-message">
+            {% for error in field.vars.errors %}
+                <li>{{ error.message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}

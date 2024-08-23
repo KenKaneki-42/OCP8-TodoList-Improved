@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Task{% endblock %}
+
+{% block body %}
+    <h1>Modification de tâche</h1>
+
+    {{ include('task/_form.html.twig') }}
+
+    <a href="{{ path('task_list') }}">Retour à la liste des tâches</a>
+
+    {{ include('task/_delete_form.html.twig') }}
+{% endblock %}

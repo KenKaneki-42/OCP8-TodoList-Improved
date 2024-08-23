@@ -1,0 +1,59 @@
+{# {% extends 'base.html.twig' %}
+
+{% block title %}Créer un utilisateur{% endblock %}
+
+{% block body %}
+    <div class="row user-form">
+        {{ form_start(form, {'action' : path('user_create')}) }}
+            {{ form_widget(form) }}
+
+            <button type="submit" class="btn btn-success pull-right add-user-button">Ajouter</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %} #}
+{% extends 'base.html.twig' %}
+
+{% import 'macros.html.twig' as macros %}
+
+{% block title %}Créer un utilisateur{% endblock %}
+
+{% block body %}
+    <h1>Créer un utilisateur</h1>
+    <div class="row user-form">
+        {{ form_start(form, {'action' : path('user_create')}) }}
+
+        <div>
+            <label for="user_username" class="required">Nom d'utilisateur</label>
+            {{ macros.display_errors(form.username) }}
+            {{ form_widget(form.username) }}
+        </div>
+
+        <div>
+            <label for="user_email" class="required">Email</label>
+            {{ macros.display_errors(form.email) }}
+            {{ form_widget(form.email) }}
+        </div>
+
+        <div>
+            <label for="user_password_first" class="required">Mot de passe</label>
+            {{ macros.display_errors(form.password.first) }}
+            {{ form_widget(form.password.first) }}
+        </div>
+
+        <div>
+            <label for="user_password_second" class="required">Confirmer le mot de passe</label>
+            {{ macros.display_errors(form.password.second) }}
+            {{ form_widget(form.password.second) }}
+        </div>
+
+        <div>
+            <label for="user_roles" class="required">Rôles</label>
+            {{ macros.display_errors(form.roles) }}
+            {{ form_widget(form.roles) }}
+        </div>
+
+        <button type="submit" class="btn btn-success pull-right add-user-button">Ajouter</button>
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

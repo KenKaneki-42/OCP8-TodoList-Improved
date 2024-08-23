@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block header_title %}
+    <div class="h1-task-create">
+        <h1>Liste des tâches terminées</h1>
+        <div class="create-task-butt">
+            <a href="{{ path('task_create') }}" class="btn btn-info"><i class="bi bi-vector-pen pe-2"></i>Créer une nouvelle tâche</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="row task-list">
+        {% for task in tasks %}
+            {% if task.user is not null %}
+                <div class="thumbnail">
+                    <div class="caption">
+                        <div class ="task-toggle">
+                            <h4 class="pull-right">
+                                {% if task.isDone %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
+                            </h4>
+                        </div>
+                        <div class="task-header">
+                            <h4>{{ task.title }}</h4>
+                            <h5><em>{{ task.user.username }} - Création : {{ task.createdAt | date('Y-m-d H:i') }}</em></h5>
+                        </div>
+                        <div class="task-content">
+                            <p>{{ task.content }}</p>
+                        </div>
+                    </div>
+
+                    {% if app.user == task.user or is_granted('ROLE_SUPER_ADMIN') %}
+                    <div class="task-actions">
+                        <div class="task-actions-toggle">
+                            <form action="{{ path('task_toggle', {'id' : task.id }) }}">
+                                <button class="btn btn-success btn-sm pull-right">
+                                    {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="thumbnail">
+                    <div class="caption">
+                        <div class ="task-toggle">
+                            <h4 class="pull-right">
+                                {% if task.isDone %}
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="task-header">
+                            <h4>{{ task.title }}</h4>
+                            <h5><em>Utilisateur anonyme - Création : {{ task.createdAt | date('Y-m-d H:i') }}</em></h5>
+                        </div>
+                        <div class="task-content">
+                            <p>{{ task.content }}</p>
+                        </div>
+                    </div>
+
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_SUPER_ADMIN') %}
+                        <div class="task-actions">
+                            <div class="task-actions-toggle">
+                                <form action="{{ path('task_toggle', {'id' : task.id }) }}">
+                                    <button class="btn btn-success btn-sm pull-right">
+                                        {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                Il n'y a pas encore de tâche enregistrée.
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

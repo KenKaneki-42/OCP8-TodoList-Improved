@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>{% block title %}To Do List app{% endblock %}</title>
+
+        {% block stylesheets %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block navbar %}
+            {{ include('_header.html.twig') }}
+        {% endblock %}
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} alert-dismissible no-margin" role="alert">
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                                <div class="alert-message">
+                                    {{ message }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    {% block header_title %}{% endblock %}
+                    {% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">{% endblock %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        {% block body %}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <hr>
+            <footer>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <p class="pull-right">Copyright &copy; OpenClassrooms</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        {% block javascripts %}
+            {% block importmap %}
+                {{ importmap('app') }}
+            {% endblock %}
+        {% endblock %}
+    </body>
+</html>

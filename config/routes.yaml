@@ -1,0 +1,11 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+exception:
+    path: /_error/{code}
+    controller: App\Controller\ExceptionController::show
+    requirements:
+        code: \d+
