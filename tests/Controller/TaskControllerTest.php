@@ -229,18 +229,28 @@ class TaskControllerTest extends WebTestCase
         $this->client->followRedirects();
         $user = $this->userRepository->findOneBy(['email' => 'user@email.fr']);
         $this->client->loginUser($user);
+
+        //Create a task to delete
         $this->client->request('GET', '/tasks/create');
         $this->client->submitForm('Ajouter', ['task[title]' => 'TitleToDelete', 'task[content]' => 'ContentToDelete']);
 
+        //Check the task is created
+        $task = $this->taskRepository->findOneBy(['title' => 'TitleToDelete']);
+        $this->assertNotNull($task, 'La tâche n\'a pas été créée.');
+
+        // Go to the edit page for delete task
+        $this->client->request('GET', '/tasks/' . $task->getId() . '/edit');
+
+        //Retrieve delete form
         $crawler = $this->client->getCrawler();
-        // Find the specific <h4> by its content
-        $h4ToClick = $crawler->filter('h4:contains("TitleToDelete")')->first();
-        // Find the parent .thumbnail div containing the <h4> and the toggle button
-        $thumbnailDiv = $h4ToClick->closest('.thumbnail');
-        // Use the button text to find the specific toggle button in the parent
-        $deleteButton = $thumbnailDiv->selectButton('Supprimer');
-        // Submit the form associated with the toggle button
+        $deleteButton = $crawler->selectButton('Supprimer');
+
+        // Submit the form for delete
         $this->client->submit($deleteButton->form());
+
+        // Check the task is deleted
+        $taskCount = $this->taskRepository->findBy(['title' => 'TitleToDelete']);
+        $this->assertCount(0, $taskCount, 'La tâche n\'a pas été supprimée.');
 
         $currentUrl = $this->client->getRequest()->getPathInfo();
         $taskCount = $this->taskRepository->findByTitle('TitleToDelete');
