@@ -34,7 +34,7 @@ class SecurityController extends AbstractController
     public function logout(SessionInterface $session): void
     {
         // Invalidate the session
-        // $session->invalidate();
+        $session->invalidate();
 
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }

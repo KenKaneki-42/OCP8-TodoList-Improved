@@ -119,10 +119,14 @@ class TaskController extends AbstractController
         // Check if the user has permission to delete the task (Voter)
         $this->denyAccessUnlessGranted('delete', $task);
 
-        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->getPayload()->getString('_token'))) {
+        // Check if the CSRF token is valid
+        $csrfToken = $request->request->get('_token');
+        if ($this->isCsrfTokenValid('delete'.$task->getId(), $csrfToken)) {
+
             $taskRepository->remove($task, true);
-            // Invalidate cache
+            
             $cachePool->invalidateTags(['tasksCache', 'tasksDoneCache']);
+
             $this->addFlash('success', 'La tâche a bien été supprimée.');
         }
 
