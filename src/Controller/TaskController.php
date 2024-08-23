@@ -121,10 +121,10 @@ class TaskController extends AbstractController
 
         // Check if the CSRF token is valid
         $csrfToken = $request->request->get('_token');
-        if ($this->isCsrfTokenValid('delete'.$task->getId(), $csrfToken)) {
+        if ($this->isCsrfTokenValid('delete_task', $csrfToken)) {
 
             $taskRepository->remove($task, true);
-            
+
             $cachePool->invalidateTags(['tasksCache', 'tasksDoneCache']);
 
             $this->addFlash('success', 'La tâche a bien été supprimée.');
