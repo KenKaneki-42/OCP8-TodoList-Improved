@@ -30,7 +30,6 @@
 # Embedded web-server pid file
 /.web-server-pid
 
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -62,10 +61,3 @@ phpstan.neon
 ###> symfony/phpunit-bridge ###
 .phpunit.result.cache
 /phpunit.xml
-###< symfony/phpunit-bridge ###
-
-# Ignore the cache directory
-.phpunit.cache/
-
-# Ignore the coverage directory
-public/test-coverage/
