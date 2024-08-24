@@ -35,6 +35,13 @@ class UserFixtures extends Fixture
 
         $manager->persist($admin);
 
+        // Create a super admin
+        $superAdmin = new User();
+        $superAdmin->setUsername('super_admin')
+            ->setEmail('super.admin@orange.fr')
+            ->setPassword($this->passwordHasher->hashPassword($superAdmin, 'password'))
+            ->setRoles(['ROLE_SUPER_ADMIN']);
+
         $manager->flush();
     }
 }
