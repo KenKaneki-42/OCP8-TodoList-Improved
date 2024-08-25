@@ -38,27 +38,31 @@ class TaskRepository extends ServiceEntityRepository
         }
     }
 
-public function findUserTasks(UserInterface $user): array
-{
-    $queryBuilder = $this->createQueryBuilder('t')
-        ->andWhere('t.isDone = :done')
-        ->setParameter('done', false);
-
-    if (!$this->security->isGranted('ROLE_ADMIN', $user)) {
-        $queryBuilder->andWhere('t.user = :user')
-            ->setParameter('user', $user);
-    }
-
-    return $queryBuilder->getQuery()->getResult();
-}
-
-    public function findUserTasksDone(): array
+    public function findUserTasks(UserInterface $user): array
     {
-        return $this->createQueryBuilder('t')
+        $queryBuilder = $this->createQueryBuilder('t')
             ->andWhere('t.isDone = :done')
-            ->setParameter('done', true)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('done', false);
+
+        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->security->isGranted('ROLE_SUPER_ADMIN')) {
+            $queryBuilder->andWhere('t.user = :user')
+                ->setParameter('user', $user);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+    public function findUserTasksDone(UserInterface $user): array
+    {
+        $queryBuilder = $this->createQueryBuilder('t')
+            ->andWhere('t.isDone = :done')
+            ->setParameter('done', true);
+
+        if (!$this->security->isGranted('ROLE_ADMIN') && !$this->security->isGranted('ROLE_SUPER_ADMIN')) {
+            $queryBuilder->andWhere('t.user = :user')
+                ->setParameter('user', $user);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
 }
