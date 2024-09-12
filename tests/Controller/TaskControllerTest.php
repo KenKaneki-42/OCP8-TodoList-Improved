@@ -133,7 +133,7 @@ class TaskControllerTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Créer une nouvelle tâche');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        $this->client->submitForm('Ajouter', ['task[title]' => 'TestTitle', 'task[content]' => 'TestContent']);
+        $this->client->submitForm('Créer', ['task[title]' => 'TestTitle', 'task[content]' => 'TestContent']);
         // $crawler = $this->client->followRedirect();
         $currentUrl = rtrim($this->client->getRequest()->getPathInfo(), '/');
         $task = $this->taskRepository->findOneByUser($user);
@@ -156,7 +156,7 @@ class TaskControllerTest extends WebTestCase
         $user = $this->userRepository->findOneBy(['email' => 'user@email.fr']);
         $this->client->loginUser($user);
         $this->client->request('GET', '/tasks/create');
-        $this->client->submitForm('Ajouter', ['task[title]' => 'TitleTestEdit', 'task[content]' => 'ContentTestEdit']);
+        $this->client->submitForm('Créer', ['task[title]' => 'TitleTestEdit', 'task[content]' => 'ContentTestEdit']);
 
         // Retrieve the task to edit
         $task = $this->taskRepository->findOneByUser($user);
@@ -166,7 +166,7 @@ class TaskControllerTest extends WebTestCase
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         //Submit the form with the new values
-        $this->client->submitForm('Modifier', ['task[title]' => 'TitleTestEdited', 'task[content]' => 'ContentTestEdited']);
+        $this->client->submitForm('Enregistrer', ['task[title]' => 'TitleTestEdited', 'task[content]' => 'ContentTestEdited']);
 
         $currentUrl = $this->client->getRequest()->getPathInfo();
         $task = $this->taskRepository->findOneByUser($user);
@@ -195,7 +195,7 @@ class TaskControllerTest extends WebTestCase
         $user = $this->userRepository->findOneBy(['email' => 'user@email.fr']);
         $this->client->loginUser($user);
         $this->client->request('GET', '/tasks/create');
-        $this->client->submitForm('Ajouter', ['task[title]' => 'TitleToggleSimple', 'task[content]' => 'ContentToggleSimple']);
+        $this->client->submitForm('Créer', ['task[title]' => 'TitleToggleSimple', 'task[content]' => 'ContentToggleSimple']);
         $crawler = $this->client->getCrawler();
 
         // Find the specific <h4> by its content
@@ -232,7 +232,7 @@ class TaskControllerTest extends WebTestCase
 
         //Create a task to delete
         $this->client->request('GET', '/tasks/create');
-        $this->client->submitForm('Ajouter', ['task[title]' => 'TitleToDelete', 'task[content]' => 'ContentToDelete']);
+        $this->client->submitForm('Créer', ['task[title]' => 'TitleToDelete', 'task[content]' => 'ContentToDelete']);
 
         //Check the task is created
         $task = $this->taskRepository->findOneBy(['title' => 'TitleToDelete']);

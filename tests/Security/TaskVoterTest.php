@@ -53,18 +53,18 @@ class TaskVoterTest extends TestCase
         $task3 = new Task();
         $task3->setUser($anotherUser);
 
+        $this->assertEquals(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $task3, [TaskVoter::DELETE]));
         $this->assertEquals(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $task1, [TaskVoter::DELETE]));
         $this->assertEquals(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $task1, [TaskVoter::TOGGLE]));
         $this->assertEquals(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $task2, [TaskVoter::DELETE]));
         $this->assertEquals(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $task2, [TaskVoter::TOGGLE]));
-        $this->assertEquals(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $task3, [TaskVoter::DELETE]));
         $this->assertEquals(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $task3, [TaskVoter::TOGGLE]));
     }
 
     public function testTaskVoterOnAdminUser(): void
     {
-        $user = new User();
-        $user->setRoles(['ROLE_ADMIN']);
+        $admin = new User();
+        $admin->setRoles(['ROLE_ADMIN']);
 
         $anotherUser = new User();
         $anotherUser->setRoles(['ROLE_USER']);
@@ -72,7 +72,7 @@ class TaskVoterTest extends TestCase
         $this->token
             ->expects($this->atLeastOnce())
             ->method('getUser')
-            ->willReturn($user);
+            ->willReturn($admin);
 
         $this->security
             ->expects($this->atLeastOnce())
@@ -85,7 +85,7 @@ class TaskVoterTest extends TestCase
         $task1->setUser(null);
 
         $task2 = new Task();
-        $task2->setUser($user);
+        $task2->setUser($admin);
 
         $task3 = new Task();
         $task3->setUser($anotherUser);
@@ -94,8 +94,8 @@ class TaskVoterTest extends TestCase
         $this->assertEquals(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $task1, [TaskVoter::TOGGLE]));
         $this->assertEquals(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $task2, [TaskVoter::DELETE]));
         $this->assertEquals(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $task2, [TaskVoter::TOGGLE]));
-        $this->assertEquals(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $task3, [TaskVoter::DELETE]));
-        $this->assertEquals(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $task3, [TaskVoter::TOGGLE]));
+        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $task3, [TaskVoter::DELETE]));
+        $this->assertEquals(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $task3, [TaskVoter::TOGGLE]));
     }
 
     public function testTaskVoterOnSuperAdminUser(): void

@@ -89,22 +89,26 @@ class TaskRepositoryTest extends KernelTestCase
 
     public function testFindUserTasksDone(): void
     {
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => 'user@email.fr']);
+
         $task1 = new Task();
         $task1->setTitle('Task 1');
         $task1->setContent('Content for Task 1');
         $task1->setIsDone(false);
         $task1->setCreatedAt(new \DateTimeImmutable());
+        $task1->setUser($user);
 
         $task2 = new Task();
         $task2->setTitle('Task 2');
         $task2->setContent('Content for Task 2');
         $task2->setIsDone(true);
         $task2->setCreatedAt(new \DateTimeImmutable());
+        $task2->setUser($user);
 
         $this->taskRepository->save($task1, true);
         $this->taskRepository->save($task2, true);
 
-        $tasks = $this->taskRepository->findUserTasksDone();
+        $tasks = $this->taskRepository->findUserTasksDone($user);
 
         $this->assertCount(1, $tasks);
         $this->assertEquals('Task 2', $tasks[0]->getTitle());
