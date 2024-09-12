@@ -2,10 +2,12 @@
 
 {% block title %}New Task{% endblock %}
 
+{% block header_img %}<img class="slide-image img-fluid w-100 mb-3" src="{{ asset('images/todolist_content.jpg') }}" alt="todo list content">{% endblock %}
+
 {% block body %}
     <h1>Créer une nouvelle tâche</h1>
 
-    {{ include('task/_form.html.twig') }}
+    {{ include('task/_form.html.twig', { 'button_label': 'Créer', 'form_action': 'create' }) }}
 
     <a href="{{ path('task_list') }}">Retour à la liste des tâches</a>
 {% endblock %}

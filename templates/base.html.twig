@@ -5,11 +5,13 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
-        <meta name="author" content="">
+        <meta name="author" content="Sylvain Vandermeersch">
 
         <title>{% block title %}To Do List app{% endblock %}</title>
 
         {% block stylesheets %}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+            <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
         {% endblock %}
     </head>
     <body>
@@ -17,7 +19,7 @@
             {{ include('_header.html.twig') }}
         {% endblock %}
 
-        <div class="container">
+        <div class="container my-3">
             <div class="row">
                 <div class="col-md-12">
                     {% for label, messages in app.flashes %}
@@ -32,7 +34,7 @@
                     {% endfor %}
 
                     {% block header_title %}{% endblock %}
-                    {% block header_img %}<img class="slide-image" src="{{ asset('img/todolist_homepage.jpg') }}" alt="todo list">{% endblock %}
+                    {% block header_img %}<img class="slide-image img-fluid w-100" src="{{ asset('images/todolist_content.jpg') }}" alt="todo list">{% endblock %}
                 </div>
 
                 <div class="row">
@@ -44,16 +46,9 @@
             </div>
         </div>
 
-        <div class="container">
-            <hr>
-            <footer>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <p class="pull-right">Copyright &copy; OpenClassrooms</p>
-                    </div>
-                </div>
-            </footer>
-        </div>
+        {% block footer %}
+            {{ include('_footer.html.twig') }}
+        {% endblock %}
 
         {% block javascripts %}
             {% block importmap %}
