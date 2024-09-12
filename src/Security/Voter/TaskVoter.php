@@ -14,6 +14,8 @@ class TaskVoter extends Voter
     public const DELETE = 'delete';
     public const CREATE = 'create';
     public const EDIT = 'edit';
+    public const ATTRIBUTES = [self::DELETE, self::TOGGLE, self::EDIT, self::CREATE];
+
     private Security $security;
 
     public function __construct(Security $security)
@@ -23,17 +25,7 @@ class TaskVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        // if the attribute isn't one we support, return false
-        if (!in_array($attribute, [self::DELETE, self::TOGGLE, self::EDIT, self::CREATE])) {
-            return false;
-        }
-
-        // only vote on `Task` objects
-        if (!$subject instanceof Task) {
-            return false;
-        }
-
-        return true;
+        return in_array($attribute, self::ATTRIBUTES, true) && $subject instanceof Task;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -41,43 +33,33 @@ class TaskVoter extends Voter
         $user = $token->getUser();
 
         if (!$user instanceof User) {
-            // the user must be logged in; if not, deny access
             return false;
         }
 
-        if ($this->security->isGranted('ROLE_SUPER_ADMIN') && 'super.admin@orange.fr' === $user->getEmail()) {
+        if ($this->isSuperAdmin($user)) {
             return true;
         }
 
-        // you know $subject is a Task object, thanks to `supports()`
-        /** @var Task $task */
         $task = $subject;
 
-        if ($this->security->isGranted('ROLE_ADMIN') && null === $task->getUser()) {
+        if ($this->security->isGranted('ROLE_ADMIN') && $task->getUser() === null) {
             return true;
         }
 
         return match ($attribute) {
-            self::TOGGLE => $this->canToggle($task, $user),
-            self::DELETE => $this->canDelete($task, $user),
-            self::EDIT => $this->canEdit($task, $user),
-            self::CREATE => $this->canDelete($task, $user),
+            self::TOGGLE, self::DELETE, self::EDIT => $this->canPerformAction($task, $user),
+            self::CREATE => true,
             default => throw new \LogicException('Ce voteur ne devrait pas être atteint.')
         };
     }
 
-    private function canToggle(Task $task, User $user): bool
-    {
-        return $user === $task->getUser();
-    }
-
-    private function canDelete(Task $task, User $user): bool
-    {
-        return $user === $task->getUser();
-    }
-
-    private function canEdit(Task $task, User $user): bool
+    private function canPerformAction(Task $task, User $user): bool
     {
         return $user === $task->getUser() || $this->security->isGranted('ROLE_ADMIN');
+    }
+
+    private function isSuperAdmin(User $user): bool
+    {
+        return $this->security->isGranted('ROLE_SUPER_ADMIN') && $user->getEmail() === 'super.admin@orange.fr';
     }
 }
