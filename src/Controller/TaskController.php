@@ -51,7 +51,7 @@ class TaskController extends AbstractController
         $user = $security->getUser();
         $task->setUser($user);
 
-        $form = $this->createForm(TaskType::class, $task);
+        $form = $this->createForm(TaskType::class, $task, ['form_action' => 'create']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -78,7 +78,7 @@ class TaskController extends AbstractController
     {
         $this->denyAccessUnlessGranted('edit', $task);
 
-        $form = $this->createForm(TaskType::class, $task);
+        $form = $this->createForm(TaskType::class, $task, ['form_action' => 'edit']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -99,7 +99,7 @@ class TaskController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/toggle', name: 'task_toggle', methods: ['GET','POST'])]
+    #[Route('/{id}/toggle', name: 'task_toggle', methods: ['POST'])]
     public function toggle(Task $task, TaskRepository $taskRepository, TagAwareCacheInterface $cachePool, Request $request): Response
     {
         // Check if the user has permission to toggle the task (Voter)
@@ -110,7 +110,7 @@ class TaskController extends AbstractController
         // Use the session ID to create a unique cache key to avoid cache conflicts between users on the same machine
         $session = $request->getSession()->getId();
         // Invalidate cache
-        $cachePool->invalidateTags([["tasksCache_{$session}"], 'tasksDoneCache']);
+        $cachePool->invalidateTags(["tasksCache_{$session}", 'tasksDoneCache']);
 
         $message = $task->isDone()
         ? sprintf('La tâche \'%s\' a bien été marquée comme faite.', $task->getTitle())
@@ -121,7 +121,7 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('task_list');
     }
 
-    #[Route('/{id}', name: 'task_delete', methods: ['POST'])]
+    #[Route('/{id}/delete', name: 'task_delete', methods: ['POST'])]
     public function delete(Request $request, Task $task, TaskRepository $taskRepository, TagAwareCacheInterface $cachePool): Response
     {
         // Check if the user has permission to delete the task (Voter)
@@ -134,7 +134,7 @@ class TaskController extends AbstractController
             $taskRepository->remove($task, true);
             // Use the session ID to create a unique cache key to avoid cache conflicts between users on the same machine
             $session = $request->getSession()->getId();
-            $cachePool->invalidateTags([["tasksCache_{$session}"], 'tasksDoneCache']);
+            $cachePool->invalidateTags(["tasksCache_{$session}", 'tasksDoneCache']);
 
             $this->addFlash('success', 'La tâche a bien été supprimée.');
         }
@@ -158,4 +158,5 @@ class TaskController extends AbstractController
 
         return $this->render('task/list-done.html.twig', ['tasks' => $tasksList]);
     }
+
 }
