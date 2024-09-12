@@ -54,7 +54,7 @@ class SecurityControllerTest extends WebTestCase
       $this->assertGreaterThan(0, $crawler->filter('input[name="_password"]')->count(), 'Le champ _password est manquant');
 
       // Soumettez le formulaire avec les données de connexion
-      $this->client->submitForm('Confirmer', [
+      $this->client->submitForm('Se connecter', [
           '_username' => 'user@email.fr',
           '_password' => 'password'
       ]);
@@ -78,7 +78,7 @@ class SecurityControllerTest extends WebTestCase
     public function testLoginFailure(): void
     {
         $this->client->request(Request::METHOD_GET, '/login');
-        $this->client->submitForm('Confirmer', ['_username' => 'invalid@email.fr', '_password' => 'invalidpassword']);
+        $this->client->submitForm('Se connecter', ['_username' => 'invalid@email.fr', '_password' => 'invalidpassword']);
         $crawler = $this->client->followRedirect();
         $currentUrl = $this->client->getRequest()->getPathInfo();
 

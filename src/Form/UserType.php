@@ -21,6 +21,7 @@ class UserType extends AbstractType
                 'label' => 'Nom d\'utilisateur',
                 'attr' => [
                     'placeholder' => 'Saisir votre nom d\'utilisateur',
+                    'class' => 'form-control',
                 ],
             ])
             ->add('password', RepeatedType::class, [
@@ -31,12 +32,14 @@ class UserType extends AbstractType
                     'label' => 'Mot de passe',
                     'attr' => [
                         'placeholder' => 'Saisir votre mot de passe',
+                        'class' => 'form-control',
                     ],
                 ],
                 'second_options' => [
                     'label' => 'Confirmer le mot de passe',
                     'attr' => [
                         'placeholder' => 'Confirmer votre mot de passe',
+                        'class' => 'form-control',
                     ],
                 ],
             ])
@@ -44,6 +47,7 @@ class UserType extends AbstractType
                 'label' => 'Email',
                 'attr' => [
                     'placeholder' => 'Saisir votre email',
+                    'class' => 'form-control',
                 ],
             ])
             ->add('roles', ChoiceType::class, [
@@ -54,7 +58,10 @@ class UserType extends AbstractType
                 'label' => 'Rôle de l\'utilisateur',
                 'expanded' => false,
                 'multiple' => true,
-                'placeholder' => 'Sélectionnez un rôle',
+                'attr' => [
+                  'class' => 'form-select',
+                ],
+                'help' => 'Sélectionnez un rôle pour cet utilisateur.',
                 ],
             );
 

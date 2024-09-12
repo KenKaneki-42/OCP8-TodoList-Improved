@@ -1,84 +1,67 @@
 {% extends 'base.html.twig' %}
 
 {% block header_title %}
-    <div class="h1-task-create">
+    <div class="h1-task-create text-center my-4">
         <h1>Liste des tâches terminées</h1>
-        <div class="create-task-butt">
+        <div class="my-3">
             <a href="{{ path('task_create') }}" class="btn btn-info"><i class="bi bi-vector-pen pe-2"></i>Créer une nouvelle tâche</a>
         </div>
     </div>
 {% endblock %}
 
+{% block header_img %}<img class="slide-image img-fluid w-100 mb-3" src="{{ asset('images/todolist_content.jpg') }}" alt="todo list content">{% endblock %}
+
 {% block body %}
-    <div class="row task-list">
-        {% for task in tasks %}
-            {% if task.user is not null %}
-                <div class="thumbnail">
-                    <div class="caption">
-                        <div class ="task-toggle">
-                            <h4 class="pull-right">
-                                {% if task.isDone %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
-                            </h4>
+    <div class="container mt-3">
+        <div class="row task-list">
+            {% for task in tasks %}
+                <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4">
+                    <div class="card h-100 shadow-sm card-custom">
+                        <div class="card-body card-body-custom">
+                            <a href="{{ path('task_edit', {'id' : task.id }) }}" class="link-custom">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title mb-3 card-title-custom">
+                                        {{ task.title }}
+                                    </h4>
+                                    {# <span class="badge {% if task.isDone %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if task.isDone %}Terminée{% else %}À faire{% endif %}
+                                    </span> #}
+                                </div>
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    <p> Auteur :
+                                    {% if task.user is not null %}
+                                        {{ task.user.username }}
+                                    {% else %}
+                                        anonyme
+                                    {% endif %}
+                                    </p>
+                                </h6>
+                                <p>Création : {{ task.createdAt | date('Y-m-d H:i') }}</p>
+                                <p class="card-text">{{ task.content | slice(0, 100) }}{% if task.content|length > 100 %}...{% endif %}</p>
+                            </a>
                         </div>
-                        <div class="task-header">
-                            <h4>{{ task.title }}</h4>
-                            <h5><em>{{ task.user.username }} - Création : {{ task.createdAt | date('Y-m-d H:i') }}</em></h5>
-                        </div>
-                        <div class="task-content">
-                            <p>{{ task.content }}</p>
-                        </div>
-                    </div>
-
-                    {% if app.user == task.user or is_granted('ROLE_SUPER_ADMIN') %}
-                    <div class="task-actions">
-                        <div class="task-actions-toggle">
-                            <form action="{{ path('task_toggle', {'id' : task.id }) }}">
-                                <button class="btn btn-success btn-sm pull-right">
-                                    {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            {% else %}
-                <div class="thumbnail">
-                    <div class="caption">
-                        <div class ="task-toggle">
-                            <h4 class="pull-right">
-                                {% if task.isDone %}
-                                    <span class="glyphicon glyphicon-ok"></span>
-                                {% else %}
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                {% endif %}
-                            </h4>
-                        </div>
-                        <div class="task-header">
-                            <h4>{{ task.title }}</h4>
-                            <h5><em>Utilisateur anonyme - Création : {{ task.createdAt | date('Y-m-d H:i') }}</em></h5>
-                        </div>
-                        <div class="task-content">
-                            <p>{{ task.content }}</p>
-                        </div>
-                    </div>
-
-                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_SUPER_ADMIN') %}
-                        <div class="task-actions">
-                            <div class="task-actions-toggle">
-                                <form action="{{ path('task_toggle', {'id' : task.id }) }}">
-                                    <button class="btn btn-success btn-sm pull-right">
+                        <div class="card-footer d-flex justify-content-between">
+                            {% if app.user == task.user or is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_ADMIN') %}
+                                <form method="post" action="{{ path('task_toggle', {'id' : task.id }) }}">
+                                    <button class="btn btn-success btn-sm">
                                         {% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
                                     </button>
                                 </form>
-                            </div>
+                                <form method="post" action="{{ path('task_delete', {'id' : task.id }) }}" onsubmit="return confirm('Êtes vous sûr de vouloir supprimer la tâche ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ task.id) }}">
+                                    <button class="btn btn-danger btn-sm">Supprimer</button>
+                                </form>
+                            {% endif %}
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
-            {% endif %}
-        {% else %}
-            <div class="alert alert-warning" role="alert">
-                Il n'y a pas encore de tâche enregistrée.
-            </div>
-        {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-warning" role="alert">
+                        Il n'y a pas encore de tâche enregistrée.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

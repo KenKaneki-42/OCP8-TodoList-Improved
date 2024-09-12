@@ -13,11 +13,6 @@ class TaskType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-                'label' => 'Date de création',
-                'attr' => ['class' => 'form-control'],
-            ])
             ->add('title', null, [
                 'label' => 'Titre',
                 'constraints' => [
@@ -34,12 +29,25 @@ class TaskType extends AbstractType
                 'attr' => ['class' => 'form-check-input'],
             ])
         ;
+
+        // Conditionally add the 'createdAt' field for edit forms
+        if ($options['form_action'] === 'edit') {
+            $builder->add('createdAt', null, [
+                'widget' => 'single_text',
+                'label' => 'Date de création',
+                'attr' => ['
+                    class' => 'form-control',
+                    'readonly' => true,
+                ],
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Task::class,
+            'form_action' => 'create',
         ]);
     }
 }
