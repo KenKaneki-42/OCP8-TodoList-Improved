@@ -1,3 +1,27 @@
 body {
     background-color: skyblue;
 }
+
+.card-custom {
+  border-radius: 15px;
+  overflow: hidden;
+  min-height: 180px;
+}
+
+.card-body-custom {
+  background-color: #f8f9fa;
+}
+
+.card-title-custom {
+  color: #343a40;
+}
+
+form .form-control:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+.link-custom {
+  color: inherit;
+  text-decoration: none;
+}
