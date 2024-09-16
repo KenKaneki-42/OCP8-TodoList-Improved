@@ -8,6 +8,4 @@
     <h1>Créer une nouvelle tâche</h1>
 
     {{ include('task/_form.html.twig', { 'button_label': 'Créer', 'form_action': 'create' }) }}
-
-    <a href="{{ path('task_list') }}">Retour à la liste des tâches</a>
 {% endblock %}
