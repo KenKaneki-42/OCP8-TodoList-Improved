@@ -129,14 +129,15 @@ class TaskController extends AbstractController
 
         // Check if the CSRF token is valid
         $csrfToken = $request->request->get('_token');
-        if ($this->isCsrfTokenValid('delete_task', $csrfToken)) {
-
+        if ($this->isCsrfTokenValid('delete_task' . $task->getId(), $csrfToken)) {
             $taskRepository->remove($task, true);
             // Use the session ID to create a unique cache key to avoid cache conflicts between users on the same machine
             $session = $request->getSession()->getId();
             $cachePool->invalidateTags(["tasksCache_{$session}", 'tasksDoneCache']);
 
             $this->addFlash('success', 'La tâche a bien été supprimée.');
+        } else {
+          $this->addFlash('error', 'Jeton CSRF invalide. La tâche n\'a pas été supprimée.');
         }
 
         return $this->redirectToRoute('task_list', [], Response::HTTP_SEE_OTHER);
