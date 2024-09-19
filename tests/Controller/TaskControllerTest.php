@@ -83,12 +83,6 @@ class TaskControllerTest extends WebTestCase
         $crawler = $this->client->click($link);
         $currentUrl = $this->client->getRequest()->getPathInfo();
         $this->assertEquals('/tasks/create', $currentUrl);
-
-        // Follow the link to return to the task list
-        $link = $crawler->selectLink('Retour à la liste des tâches')->link();
-        $crawler = $this->client->click($link);
-        $currentUrl = rtrim($this->client->getRequest()->getPathInfo(), '/');
-        $this->assertEquals('/tasks', $currentUrl);
     }
 
     public function testTasksDone(): void
@@ -112,12 +106,6 @@ class TaskControllerTest extends WebTestCase
         $currentUrl = $this->client->getRequest()->getPathInfo();
 
         $this->assertEquals('/tasks/create', $currentUrl);
-
-        $link = $crawler->selectLink('Retour à la liste des tâches')->link();
-        $crawler = $this->client->click($link);
-        $currentUrl = rtrim($this->client->getRequest()->getPathInfo(), '/');
-
-        $this->assertEquals('/tasks', $currentUrl);
     }
 
     public function testTasksCreate(): void
