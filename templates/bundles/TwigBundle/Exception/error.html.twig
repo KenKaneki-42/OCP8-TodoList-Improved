@@ -3,6 +3,44 @@
 {% block title %}Erreur {{ status_code }}{% endblock %}
 
 {% block body %}
-    <h1>Erreur {{ status_code }}</h1>
-    <p>{{ exception.message }}</p>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h1 class="card-title">
+                            {% if status_code == 403 %}
+                                Erreur 403 : Accès interdit
+                            {% elseif status_code == 404 %}
+                                Erreur 404 : Page non trouvée
+                            {% else %}
+                                Erreur {{ status_code }}
+                            {% endif %}
+                        </h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger" role="alert">
+                            {% if status_code == 403 %}
+                                Désolé, vous n'avez pas l'autorisation d'effectuer cette action.
+                            {% elseif status_code == 404 %}
+                                Oups, la page que vous recherchez n'existe pas.
+                            {% else %}
+                                Une erreur est survenue.
+                            {% endif %}
+                        </div>
+                        <p class="text-muted">
+                            {% if status_code == 403 %}
+                                Veuillez vérifier vos permissions ou contacter l'administrateur si vous pensez que c'est une erreur.
+                            {% elseif status_code == 404 %}
+                                Vérifiez l'URL ou utilisez le lien ci-dessous pour revenir à la page d'accueil.
+                            {% else %}
+                                Il semble que quelque chose se soit mal passé. Veuillez contacter l'administrateur si le problème persiste.
+                            {% endif %}
+                        </p>
+                        <a href="{{ path('homepage') }}" class="btn btn-primary">Retour à la page d'accueil</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

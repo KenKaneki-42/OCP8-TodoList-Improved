@@ -47,19 +47,39 @@ class TaskVoter extends Voter
         }
 
         return match ($attribute) {
-            self::TOGGLE, self::DELETE, self::EDIT => $this->canPerformAction($task, $user),
+            self::TOGGLE => $this->canToggleTask($task, $user),
+            self::DELETE => $this->canDeleteTask($task, $user),
+            self::EDIT => $this->canEditTask($task, $user),
             self::CREATE => true,
             default => throw new \LogicException('Ce voteur ne devrait pas être atteint.')
         };
     }
 
-    private function canPerformAction(Task $task, User $user): bool
+    private function canToggleTask(Task $task, User $user): bool
     {
-        return $user === $task->getUser() || $this->security->isGranted('ROLE_ADMIN');
+        // Admins can toggle any task, but only owners can toggle their own tasks
+        return $user === $task->getUser() || $this->isAdmin($user);
+    }
+
+    private function canDeleteTask(Task $task, User $user): bool
+    {
+        // Only the owner or a super admin can delete the task, not regular admins
+        return $user === $task->getUser() || $this->isSuperAdmin($user);
+    }
+
+    private function canEditTask(Task $task, User $user): bool
+    {
+        // Only the owner or a super admin can edit the task, not regular admins
+        return $user === $task->getUser() || $this->isSuperAdmin($user);
     }
 
     private function isSuperAdmin(User $user): bool
     {
         return $this->security->isGranted('ROLE_SUPER_ADMIN') && $user->getEmail() === 'super.admin@orange.fr';
+    }
+
+    private function isAdmin(User $user): bool
+    {
+        return $this->security->isGranted('ROLE_ADMIN');
     }
 }
